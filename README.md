@@ -2,6 +2,8 @@
 
 CodeAssist is a tool that allows you to ask questions about your codebase and get answers from an LLM (Large Language Model) running locally via Ollama. It can also generate code changes based on your queries, which can be applied directly to your project files.
 
+This is not designed to be a massive kitchen-sink type enterprise-grade assistant. This is for casual use and iterative improvement of small projects. That said, more features will be added over time.
+
 ## Features
 
 - **Local LLM Usage**: Uses Ollama to run LLMs locally for privacy and performance.
@@ -9,6 +11,15 @@ CodeAssist is a tool that allows you to ask questions about your codebase and ge
 - **Interactive Querying**: Ask questions about your codebase and get precise answers.
 - **Code Generation**: Generate new code or modify existing files based on your queries.
 - **Safe File Editing**: Optionally save changes to your project files with backup support.
+
+## Limitations
+
+- Up to 200 source files
+- Up to 20K chars per file
+- Otherwise limited by context size
+- Does not use ChromaDB or any other RAG store.
+- Full project source is loaded to prompt.
+
 
 ## Requirements
 
