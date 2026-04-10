@@ -1,10 +1,10 @@
 
 import os
 import argparse
-import json
 from pathlib import Path
 
 from .constants import *
+from .utils import load_json, load_list, load_text
 
 
 """
@@ -42,25 +42,43 @@ def get_configuration():
         'enable_save': hasattr(args, 'enable_save')
     }
 
+    # project options take precedence
+    options = load_options(config['project'])
+    config.update(options)
+
     # merge non-command line params
     # from project-specific config
     config['ignore_patterns'] = load_ai_ignore(config['project'])
     config['langmap'] = load_langmap(config['project'])
     config['preprompt'] = load_preprompt_template(config['project'])
 
+    print_config(config)
     return config
+
+
+def print_config(config):
+    print("Ollama Configuration:")
+    print(f"\tModel: {config['model']}")
+    print(f"\tTemperature: {config['temperature']}")
+    print(f"\tContext Size: {config['num_ctx']}")
+    print("\n")
+
+
+
+
+def load_options(project_path):
+    path = os.path.join(project_path, OPTIONS_FILE)
+    
+    options = load_json(path)
+    if options is None:
+        return {}
+    return options
 
 
 def load_ai_ignore(project_path):
     patterns = set()
     path = os.path.join(project_path, AI_IGNORE_FILE)
-    if os.path.isfile(path):
-        with open(path, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith("#"):
-                    patterns.add(line)
-
+    patterns = load_list(path)
     return patterns
 
 
@@ -68,14 +86,10 @@ def load_preprompt_template(project_path):
     default = "You are a senior software engineer. Below is the full source code of a project.\n"
     default += "Answer questions about the code and, if suggesting changes, output complete updated files.\n\n"
 
-    try:
-        path = os.path.join(project_path, PREPROMPT_FILE)
-        if os.path.isfile(path):
-            with open(path, "r", encoding="utf-8") as f:
-                return f.read().strip()
-    except Exception as e:
-        print(f"!!! Could not load {PREPROMPT_FILE}: {e}")
-    
+    path = os.path.join(project_path, PREPROMPT_FILE)
+    preprompt = load_text(path)
+    if preprompt not in {None, ""}:
+        return preprompt
     return default
 
 
@@ -101,13 +115,8 @@ def load_langmap(project_path):
     }
 
     path = os.path.join(project_path, LANGUAGES_FILE)
-    if os.path.isfile(path):
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                loaded_map = json.load(f)
-                # merge with defaults
-                default_map.update(loaded_map)
-        except (json.JSONDecodeError, IOError) as e:
-            print(f"!! Failed to load {LANGUAGES_FILE}: {e}. Using defaults.")
+    loaded_map = load_json(path)
+    if loaded_map is not None:
+        default_map.update(loaded_map)
     
     return default_map

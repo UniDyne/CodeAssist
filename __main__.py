@@ -135,8 +135,6 @@ def save_files(new_files):
 
 
 def call_ollama(prompt, config):
-    print(f"Calling ollama with model {config['model']}")
-    # print(f"Using prompt:\n\n\n{prompt}\n\n\n")
     response = ollama.chat(
         model=config['model'],
         messages=[
@@ -179,7 +177,7 @@ def main():
 
         full_prompt = preprompt + "\n\nUser question: " + query + "\n\nAnswer precisely. For code changes, use:\n=== FILE: relative/path/to/file ===\n```language\n[full file content]\n```"
 
-        print("\nCalling Ollama...")
+        print(f"\nCalling Ollama...")
         response = call_ollama(full_prompt, config)
         
         if not response:

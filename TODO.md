@@ -1,6 +1,6 @@
 # TODO: Potential Improvements
 
-This file is AI-generated. Please consider with generous salt.
+This file is AI-generated. Please consider with generous amount of salt.
 
 
 ## Code Quality & Structure

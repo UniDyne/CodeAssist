@@ -23,9 +23,9 @@ IGNORE_EXTS = {".pyc", ".so", ".o", ".a", ".exe", ".dll", ".dylib", ".bin", ".da
 
 # Project-specific settings files
 AI_IGNORE_FILE = ".ai_ignore"
+OPTIONS_FILE = ".codeassist/options.json"
 LANGUAGES_FILE = ".codeassist/languages.json"
 PREPROMPT_FILE = ".codeassist/preprompt.md"
-
 
 
 #
