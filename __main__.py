@@ -75,11 +75,14 @@ def parse_llm_response(response_text: str):
 
 
 def call_ollama(prompt, config):
+    messages = []
+    if hasattr(config, 'sysprompt'):
+        messages.append({"role":"system", "content": config['sysprompt']})
+    messages.append({"role":"user", "content": prompt})
+
     response = ollama.chat(
         model=config['model'],
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
+        messages=messages,
         options={
             "temperature": config['temperature'],
             "num_ctx": config['num_ctx']

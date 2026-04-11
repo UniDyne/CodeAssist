@@ -52,6 +52,11 @@ def get_configuration():
     config['langmap'] = load_langmap(config['project'])
     config['preprompt'] = load_preprompt_template(config['project'])
 
+
+    sysprompt = load_sysprompt(config['project'])
+    if sysprompt:
+        config['sysprompt'] = sysprompt
+
     print_config(config)
     return config
 
@@ -81,6 +86,11 @@ def load_ai_ignore(project_path):
     patterns = load_list(path)
     return patterns
 
+
+def load_sysprompt(project_path):
+    path = os.path.join(project_path, SYSPROMPT_FILE)
+    return load_text(path)
+    
 
 def load_preprompt_template(project_path):
     default = "You are a senior software engineer. Below is the full source code of a project.\n"
