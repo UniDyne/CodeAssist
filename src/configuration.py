@@ -88,12 +88,16 @@ def load_ai_ignore(project_path):
 
 
 def load_sysprompt(project_path):
+    default = "You are a super-intelligent software engineering AI named CodeAssist. You are pragmatic and provide the clearest, simplest, most straightforward approach to problem-solving. Your answers are alway succinct and to the point. You never offer advice that is unwanted or pedantic."
     path = os.path.join(project_path, SYSPROMPT_FILE)
-    return load_text(path)
-    
+    sysprompt = load_text(path)
+    if sysprompt not in {None, ""}:
+        return sysprompt
+    return default
+
 
 def load_preprompt_template(project_path):
-    default = "You are a senior software engineer. Below is the full source code of a project.\n"
+    default = "The relevant source code of a project is provided below.\n"
     default += "Answer questions about the code and, if suggesting changes, output complete updated files.\n\n"
 
     path = os.path.join(project_path, PREPROMPT_FILE)

@@ -9,6 +9,8 @@ from src.constants import *
 from src.configuration import get_configuration
 from src.sourcefiles import collect_source_files, save_files
 
+from src.tools import Tool, get_tools, execute_tools
+
 
 def build_preprompt(preprompt, files, langmap):
     preprompt += "\n\n# Project Files:\n\n"
@@ -23,7 +25,7 @@ def build_preprompt(preprompt, files, langmap):
     return preprompt
 
 
-
+""" DEPRECATED :: Will migrate too "tools" as this is prone to error """
 def parse_llm_response(response_text: str):
     # Extract files from various formats:
     # 1. === FILE: path/to/file ===
@@ -75,6 +77,12 @@ def parse_llm_response(response_text: str):
 
 
 def call_ollama(prompt, config):
+    # !!TODO
+    # tools should probably get added to the config...
+    # and then turned on/off based on settings...
+    # getting tools here for now
+    tools = get_tools(config)
+
     messages = []
     if hasattr(config, 'sysprompt'):
         messages.append({"role":"system", "content": config['sysprompt']})
@@ -83,6 +91,7 @@ def call_ollama(prompt, config):
     response = ollama.chat(
         model=config['model'],
         messages=messages,
+        tools=[tool.to_dict() for tool in tools.values()],
         options={
             "temperature": config['temperature'],
             "num_ctx": config['num_ctx']

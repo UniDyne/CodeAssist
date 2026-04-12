@@ -33,6 +33,6 @@ def load_text(path):
     try:
         with open(path, "r", encoding="utf-8") as f:
             return f.read().strip()
-    except IOError as e:
+    except (UnicodeDecodeError, IOError) as e:
         print(f"!! Failed to load {path}: {e}.")
         return ""
