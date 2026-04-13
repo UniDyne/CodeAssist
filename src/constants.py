@@ -9,7 +9,8 @@
 #
 # For some reason, gpt-oss:20b does not work.
 #
-DEFAULT_MODEL = "deepseek-coder-v2"
+#DEFAULT_MODEL = "deepseek-coder-v2"
+DEFAULT_MODEL = "qwen3-coder"
 DEFAULT_TEMPERATURE = 0.2
 DEFAULT_NUM_CTX = 8192
 

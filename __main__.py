@@ -9,7 +9,7 @@ from src.constants import *
 from src.configuration import get_configuration
 from src.sourcefiles import collect_source_files, save_files
 
-from src.tools import Tool, get_tools, execute_tools
+from src.tools import Tool, get_tools, execute_tool
 
 
 def build_preprompt(preprompt, files, langmap):
@@ -81,7 +81,10 @@ def call_ollama(prompt, config):
     # tools should probably get added to the config...
     # and then turned on/off based on settings...
     # getting tools here for now
-    tools = get_tools(config)
+    if config['enable_tools']:
+        tools = get_tools(config)
+    else:
+        tools = []
 
     messages = []
     if hasattr(config, 'sysprompt'):
@@ -91,7 +94,7 @@ def call_ollama(prompt, config):
     response = ollama.chat(
         model=config['model'],
         messages=messages,
-        tools=[tool.to_dict() for tool in tools.values()],
+        tools=[tool.to_dict() for tool in tools],
         options={
             "temperature": config['temperature'],
             "num_ctx": config['num_ctx']

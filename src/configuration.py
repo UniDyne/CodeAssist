@@ -31,6 +31,7 @@ def get_configuration():
                         help="Context window size")
     
     parser.add_argument("--enable-save", action="store_true", help="Allow saving changes to project files. (WARNING)")
+    parser.add_argument("--enable-tools", action="store_true", help="Allow LLM tools")
 
     args = parser.parse_args()
     
@@ -39,7 +40,8 @@ def get_configuration():
         'model': args.model,
         'temperature': args.temperature,
         'num_ctx': args.num_ctx,
-        'enable_save': hasattr(args, 'enable_save')
+        'enable_save': hasattr(args, 'enable_save'),
+        'enable_tools': hasattr(args, 'enable_tools')
     }
 
     # project options take precedence
