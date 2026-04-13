@@ -40,8 +40,8 @@ def get_configuration():
         'model': args.model,
         'temperature': args.temperature,
         'num_ctx': args.num_ctx,
-        'enable_save': hasattr(args, 'enable_save'),
-        'enable_tools': hasattr(args, 'enable_tools')
+        'enable_save': hasattr(args, 'enable_save') and args.enable_save,
+        'enable_tools': hasattr(args, 'enable_tools') and args.enable_tools
     }
 
     # project options take precedence
@@ -100,8 +100,8 @@ def load_sysprompt(project_path):
 
 def load_preprompt_template(project_path):
     default = "The relevant source code of a project is provided below.\n"
-    default += "Answer questions about the code and, if suggesting changes, output complete updated files.\n\n"
-
+    default += "Answer questions about the code and, if suggesting changes, either use the appropriate tool (if available) or output the entire contents of the file.\n\n"
+    
     path = os.path.join(project_path, PREPROMPT_FILE)
     preprompt = load_text(path)
     if preprompt not in {None, ""}:
