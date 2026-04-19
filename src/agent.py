@@ -61,6 +61,8 @@ class Agent:
             # and for qwen3-coder (xml tool call)
             try:
                 obj = json.loads(content)
+                if not "function" in obj:
+                    obj = {'function': obj}
                 # if valid, this is probably a tool call
                 self.tool_call(obj)
                 looped = True
@@ -76,6 +78,7 @@ class Agent:
         self.messages = []
     
     def tool_call(self, obj):
+        print(obj)
         function = obj.get('function', {})
         tool_name = function.get('name', '')
         arguments = function.get('arguments', {})
@@ -85,6 +88,7 @@ class Agent:
         if tool_name in self.tools:
             tool = self.tools[tool_name]
             result = execute_tool(tool, arguments)
+            print(f"Tool result: {result}")
             self.messages.append({"role": "tool", "content": result})
         else:
             self.messages.append({"role": "tool", "content": f"Unknown tool {tool_name}"})

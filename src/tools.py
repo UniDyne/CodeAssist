@@ -27,6 +27,45 @@ class Tool:
         }
 
 
+class ListDirectory(Tool):
+    def __init__(self, config):
+        super().__init__(
+            name="list_dir",
+            description="List contents of a directory.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Path to directory to list. Defaults to project base directory."
+                    }
+                },
+                "required": []
+            }
+        )
+        self.basepath = config['project']
+    
+    def execute(self, path: str) -> str:
+        try:
+            full_path = os.path.join(self.basepath, path)
+            if not os.path.exists(full_path):
+                return f"Error: Path not found: {path}"
+            if not os.path.isdir(full_path):
+                return f"Error: Path is not a directory: {path}"
+            
+            items = []
+            with os.scandir(full_path) as it:
+                for entry in it:
+                    if not entry.name.startswith('.'):
+                        if entry.is_file():
+                            items.append(f"FILE: {entry.name}")
+                        elif entry.is_dir():
+                            items.append(f"DIR: {entry.name}")
+            return "\n".join(items) if items else "Directory is empty."
+        except Exception as e:
+            return f"Error listing directory: {e}"
+
+
 class FileReader(Tool):
     def __init__(self, config):
         super().__init__(
@@ -88,7 +127,8 @@ class FileWriter(Tool):
 def get_tools(config) -> list[Tool]:
     return [
         FileReader(config),
-        FileWriter(config)
+        FileWriter(config),
+        ListDirectory(config)
     ]
 
 def execute_tool(tool: Tool, arguments: dict[str, Any]) -> str:
