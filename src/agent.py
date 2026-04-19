@@ -1,4 +1,5 @@
 import ollama
+import json
 
 from .tools import execute_tool
 
@@ -26,6 +27,7 @@ class Agent:
 
         # Loop in order to catch tool calls
         while(True):
+
             response = self.client.chat(
                 model=self.model,
                 messages=self.messages,
@@ -36,8 +38,9 @@ class Agent:
                 }
             )
 
-            print(response)
+            #print(response)
 
+            looped = False
             message = response.get('message',{})
             self.messages.append(message)
 
@@ -45,32 +48,46 @@ class Agent:
             if content:
                 print(content)
                 # old file replacement code would go here
-            
+
+
+            tool_calls = message.get('tool_calls', [])
+            if tool_calls:
+                looped = True
+                for tool_call in tool_calls:
+                    self.tool_call(tool_call)
+                    
             # The content might be pure JSON for a tool call...
             # need to add a fix here for qwen2.5-coder (json tool call)
             # and for qwen3-coder (xml tool call)
-
-            tool_calls = message.get('tool_calls', [])
-            if not tool_calls:
+            try:
+                obj = json.loads(content)
+                # if valid, this is probably a tool call
+                self.tool_call(obj)
+                looped = True
+            except ValueError as e:
+                None
+                # catch eception, but do nothing
+            
+            if not looped:
                 break
-            for tool_call in tool_calls:
-                
-                function = tool_call.get('function',{})
-                tool_name = funciton.get('name', '')
-                arguments = function.get('arguments', {})
-
-                print(f"Calling tool {tool_name}...")
-
-                if tool_name in self.tools:
-                    tool = self.tools[tool_name]
-                    result = execute_tool(tool, arguments)
-                    self.messages.append({"role":"tool", "content": result})
-                else:
-                    self.messages.append({"role":"tool", "content": f"Unknown tool {tool_name}"})
 
 
     def clear(self):
         self.messages = []
+    
+    def tool_call(self, obj):
+        function = obj.get('function', {})
+        tool_name = function.get('name', '')
+        arguments = function.get('arguments', {})
+
+        print(f"Calling tool {tool_name}...")
+        
+        if tool_name in self.tools:
+            tool = self.tools[tool_name]
+            result = execute_tool(tool, arguments)
+            self.messages.append({"role": "tool", "content": result})
+        else:
+            self.messages.append({"role": "tool", "content": f"Unknown tool {tool_name}"})
 
 
 """
