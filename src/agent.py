@@ -1,5 +1,6 @@
 import ollama
 import json
+import re
 
 from .tools import execute_tool
 
@@ -59,8 +60,11 @@ class Agent:
             # The content might be pure JSON for a tool call...
             # need to add a fix here for qwen2.5-coder (json tool call)
             # and for qwen3-coder (xml tool call)
+            # Also, Qwen really really wants code fences around tool
+            # calls. When prompted, will only leave them off half the time.
             try:
-                obj = json.loads(content)
+                unfence = re.sub(r'^```json\s*([\s\S]*?)\s*```$', r'\1', content).strip()
+                obj = json.loads(unfence)
                 if not "function" in obj:
                     obj = {'function': obj}
                 # if valid, this is probably a tool call
